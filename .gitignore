@@ -13,3 +13,5 @@ hs_err_pid*
 
 # IntelliJ config files
 .idea/
+
+*.DS_Store
