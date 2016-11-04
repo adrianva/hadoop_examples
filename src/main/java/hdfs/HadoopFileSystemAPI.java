@@ -41,7 +41,7 @@ public class HadoopFileSystemAPI extends Configured implements Tool {
     private void put(FileSystem fs) throws IOException {
         fs.copyFromLocalFile(new Path(LOCAL_PATH), new Path(FILE_PATH));
     }
-    
+
     public int run(String[] args) throws Exception {
         // Configuration processed by ToolRunner
         Configuration conf = getConf();
