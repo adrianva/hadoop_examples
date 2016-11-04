@@ -1,3 +1,5 @@
+package hdfs;
+
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -12,25 +14,34 @@ import java.io.IOException;
 /**
  * Class to try the Java API for Hadoop
  */
-public class HadoopAPI extends Configured implements Tool {
+public class HadoopFileSystemAPI extends Configured implements Tool {
     private static final String DIR_PATH = "/kschool/";
     private static final String FILE_PATH = "/kschool/test.txt";
+    private static final String LOCAL_PATH = "/Users/adrian/Documents/localfile.txt";
 
-    public void createDir(FileSystem fs) throws IOException {
+    private void createDir(FileSystem fs) throws IOException {
         fs.mkdirs(new Path(DIR_PATH));
     }
 
-    public void writeFile(FileSystem fs) throws IOException {
+    private void writeFile(FileSystem fs) throws IOException {
         FSDataOutputStream stream = fs.create(new Path(FILE_PATH), true);
         PrintWriter pw = new PrintWriter(stream);
         pw.println("Trying to write in HDFS from Java");
         pw.close();
     }
 
-    public void deleteFile(FileSystem fs) throws IOException {
+    private void deleteFile(FileSystem fs) throws IOException {
         fs.delete(new Path(FILE_PATH), false);
     }
 
+    private void get(FileSystem fs) throws IOException {
+        fs.copyToLocalFile(new Path(FILE_PATH), new Path(LOCAL_PATH));
+    }
+
+    private void put(FileSystem fs) throws IOException {
+        fs.copyFromLocalFile(new Path(LOCAL_PATH), new Path(FILE_PATH));
+    }
+    
     public int run(String[] args) throws Exception {
         // Configuration processed by ToolRunner
         Configuration conf = getConf();
@@ -44,7 +55,7 @@ public class HadoopAPI extends Configured implements Tool {
     }
 
     public static void main(String[] args) throws Exception{
-        int res = ToolRunner.run(new HadoopAPI(), args);
+        int res = ToolRunner.run(new HadoopFileSystemAPI(), args);
 
         System.exit(res);
     }
