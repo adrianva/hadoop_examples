@@ -13,8 +13,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.BasicConfigurator;
-import wordcount.WordCountMapper;
-import wordcount.WordCountReducer;
+
 
 /**
  * Main class for the wordcount.WordCount in Hadoop
