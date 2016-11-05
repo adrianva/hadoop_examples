@@ -9,11 +9,16 @@ import java.io.IOException;
 public class DistributedGrepMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
     Text outKey = new Text();
     LongWritable one = new LongWritable(1);
+    String expression;
+
+    @Override
+    protected void setup(Mapper<LongWritable, Text, Text, LongWritable>.Context context) throws IOException{
+        expression = context.getConfiguration().get("grep", "");
+    }
 
     @Override
     protected void map(LongWritable key, Text value, Context context)
     throws IOException, InterruptedException {
-        String expression = context.getConfiguration().get("grep", "");
         if (value.toString().contains(expression)) {
             outKey.set(value);
             context.write(outKey, one);
