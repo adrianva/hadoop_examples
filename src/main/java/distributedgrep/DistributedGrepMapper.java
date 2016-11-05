@@ -13,13 +13,13 @@ public class DistributedGrepMapper extends Mapper<LongWritable, Text, Text, Long
 
     @Override
     protected void setup(Mapper<LongWritable, Text, Text, LongWritable>.Context context) throws IOException{
-        expression = context.getConfiguration().get("grep", "");
+        expression = context.getConfiguration().get("grep", "").toLowerCase();
     }
 
     @Override
     protected void map(LongWritable key, Text value, Context context)
     throws IOException, InterruptedException {
-        if (value.toString().contains(expression)) {
+        if (value.toString().toLowerCase().contains(expression)) {
             outKey.set(value);
             context.write(outKey, one);
         }

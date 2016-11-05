@@ -26,6 +26,7 @@ public class NGramCounterMapper extends Mapper<LongWritable, Text, Text, LongWri
             ngram = "";
             int j = 1;
             int position = i;
+            // Each iteration we must obtain "ngram_length" elements from the split
             while (j <= ngram_length) {
                 if (position == i) // first element of the ngram
                     ngram += splits[position];
