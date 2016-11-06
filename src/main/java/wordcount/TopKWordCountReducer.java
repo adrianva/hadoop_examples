@@ -1,5 +1,7 @@
 package wordcount;
 
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -10,32 +12,35 @@ import java.util.*;
 /**
  * Reducer class for top k word count
  */
-public class TopKWordCountReducer  extends Reducer<LongWritable, List<Text>, LongWritable, Text> {
+public class TopKWordCountReducer  extends Reducer<LongWritable, TextArrayWritable, LongWritable, Text> {
 
     private int k = 10;
-
-    private TreeMap<Long, List<Text>> words = new TreeMap<Long, List<Text>>(Collections.reverseOrder());
+    private TreeMap<Long, ArrayList<Text>> words = new TreeMap<Long, ArrayList<Text>>(Collections.reverseOrder());
 
     @Override
-    protected void setup(Reducer<LongWritable, List<Text>, LongWritable, Text>.Context context)
+    protected void setup(Reducer<LongWritable, TextArrayWritable, LongWritable, Text>.Context context)
             throws IOException{
-        k = context.getConfiguration().getInt("topwords.k", k);
+        k = context.getConfiguration().getInt("top_k", k);
     }
+
     @Override
-    protected void reduce(LongWritable key, Iterable<List<Text>> values,
-                          Reducer<LongWritable, List<Text>, LongWritable, Text>.Context context)
+    protected void reduce(LongWritable key, Iterable<TextArrayWritable> values,
+                          Reducer<LongWritable, TextArrayWritable, LongWritable, Text>.Context context)
             throws IOException, InterruptedException {
 
-
-        List<Text> emptyList = new ArrayList<Text>();
-        for (List<Text> value : values) {
-            emptyList.addAll(value);
+        ArrayList<Text> listOfWords = new ArrayList<Text>();
+        for (TextArrayWritable val: values) {
+            for (Writable writable: val.get()) {
+                Text word = (Text) writable;
+                listOfWords.add(word);
+            }
         }
-        words.put(key.get(), emptyList);
+
+        words.put(key.get(), listOfWords);
     }
 
     @Override
-    protected void cleanup(Reducer<LongWritable, List<Text>, LongWritable, Text>.Context context)
+    protected void cleanup(Reducer<LongWritable, TextArrayWritable, LongWritable, Text>.Context context)
             throws IOException, InterruptedException {
 
         int count = k;
