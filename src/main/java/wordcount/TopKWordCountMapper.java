@@ -1,7 +1,5 @@
 package wordcount;
 
-
-import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -40,11 +38,16 @@ public class TopKWordCountMapper extends Mapper<LongWritable, Text, LongWritable
         keyList.add(word);
         words.put(count, keyList);
 
+        // We only need to keep in memory a treemap os size k
         if(words.size() > k){
             words.remove(words.lastKey());
         }
     }
 
+    /*
+        In this cleanup method we simply emit lists of words and their frequencies
+        until the sum of the words emitted is greater or equal to K
+     */
     @Override
     protected void cleanup(Mapper<LongWritable, Text, LongWritable, TextArrayWritable>.Context context)
             throws IOException, InterruptedException {
@@ -60,7 +63,8 @@ public class TopKWordCountMapper extends Mapper<LongWritable, Text, LongWritable
                 LongWritable frequency = new LongWritable(key);
                 Text[] listOfWordsTextArray = listOfWords.toArray(new Text[listOfWords.size()]);
                 context.write(frequency, new TextArrayWritable(listOfWordsTextArray));
-                count -= key;
+                // Substract the number of words we have emitted
+                count -= listOfWords.size();
             }else {
                 break;
             }
